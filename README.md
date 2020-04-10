@@ -1,4 +1,4 @@
-# prayers_time
+# prayers time
 
 Python script to fetch prayers timings.
 
