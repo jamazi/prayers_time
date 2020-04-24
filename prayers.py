@@ -59,7 +59,8 @@ def main(arguments):
         if not next_prayers:
             next_prayers.append(items[0])
         next_prayer = min(next_prayers, key=lambda item: abs(item[1] - now))
-        print(next_prayer[0], next_prayer[1].strftime('%-I:%M%P'))
+        time_remaining = next_prayer[1] - now
+        print(next_prayer[0], next_prayer[1].strftime('%-I:%M%P'), '\n', 'متبقي', ':'.join(str(time_remaining).split(':')[:2]))
     else:
         for item in items:
             print(item[0], item[1].strftime('%I:%M%P'))
