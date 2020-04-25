@@ -4,7 +4,7 @@ import sys
 import os
 import argparse
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 city = 'NewYork'
@@ -52,15 +52,15 @@ def main(arguments):
     
     items = filter(lambda item: item[0] in prayers_arabic, prayers_info['data']['timings'].items())
     items = [(prayers_arabic[item[0]], datetime.combine(prayers_date, datetime.strptime(item[1], '%H:%M').time())) for item in items]
+    items.append((items[0][0], items[0][1] + timedelta(days=1))) # add next day fajr
     
     if args.next:
         now = datetime.now()
         next_prayers = list(filter(lambda item: item[1] > now, items))
-        if not next_prayers:
-            next_prayers.append(items[0])
-        next_prayer = min(next_prayers, key=lambda item: abs(item[1] - now))
-        time_remaining = next_prayer[1] - now
-        print(next_prayer[0], next_prayer[1].strftime('%-I:%M%P'), '\n', 'متبقي', ':'.join(str(time_remaining).split(':')[:2]))
+        if next_prayers: 
+            next_prayer = min(next_prayers, key=lambda item: abs(item[1] - now))
+            time_remaining = next_prayer[1] - now
+            print(next_prayer[0], next_prayer[1].strftime('%-I:%M%P'), '\n', 'متبقي', ':'.join(str(time_remaining).split(':')[:2]))
     else:
         for item in items:
             print(item[0], item[1].strftime('%I:%M%P'))
