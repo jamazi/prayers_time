@@ -10,7 +10,7 @@ import json
 city = 'NewYork'
 country = 'US'
 prayers_url = 'http://api.aladhan.com/v1/timingsByCity?method=2&city={}&country={}'.format(city, country)
-prayers_file = os.path.expanduser('~/.config/prayers')
+prayers_file = os.path.join(os.path.expanduser(os.environ.get('XDG_CACHE_HOME', '~/.cache')), 'prayers')
 prayers_arabic = {
     'Fajr': 'الفجر',
     'Sunrise': 'الشروق',
