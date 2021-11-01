@@ -9,6 +9,7 @@ import json
 
 city = 'NewYork'
 country = 'US'
+time_offset = 0
 prayers_url = 'http://api.aladhan.com/v1/timingsByCity?method=2&city={}&country={}'.format(city, country)
 prayers_file = os.path.join(os.path.expanduser(os.environ.get('XDG_CACHE_HOME', '~/.cache')), 'prayers')
 prayers_arabic = {
@@ -61,7 +62,7 @@ def main(arguments):
     items = filter(lambda item: item[0] in (prayers_arabic if not args.compact else prayers_arabic_compact), prayers_info['data']['timings'].items())
     items = [(
         prayers_arabic[item[0]] if not args.compact else prayers_arabic_compact[item[0]], 
-        datetime.combine(prayers_date, datetime.strptime(item[1], '%H:%M').time())
+        datetime.combine(prayers_date, datetime.strptime(item[1], '%H:%M').time()) + timedelta(hours=time_offset)
         ) for item in items]
     items.append((items[0][0], items[0][1] + timedelta(days=1))) # add next day fajr
 
