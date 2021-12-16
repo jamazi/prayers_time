@@ -23,3 +23,11 @@ To force update the prayers timings file
 ```
 python3 prayers.py --update
 ```
+
+
+To show output in specific language
+
+```
+python3 prayers.py --lang en
+python3 prayers.py --lang ar
+```
