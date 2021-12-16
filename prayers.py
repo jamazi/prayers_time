@@ -12,21 +12,22 @@ country = 'US'
 time_offset = 0
 prayers_url = 'http://api.aladhan.com/v1/timingsByCity?method=2&city={}&country={}'.format(city, country)
 prayers_file = os.path.join(os.path.expanduser(os.environ.get('XDG_CACHE_HOME', '~/.cache')), 'prayers')
-prayers_arabic = {
-    'Fajr': 'الفجر',
-    'Sunrise': 'الشروق',
-    'Dhuhr': 'الظهر',
-    'Asr': 'العصر',
-    'Maghrib': 'المغرب',
-    'Isha': 'العشاء'
+prayers = {
+    "ar": {
+        "Fajr": "الفجر",
+        "Sunrise": "الشروق",
+        "Dhuhr": "الظهر",
+        "Asr": "العصر",
+        "Maghrib": "المغرب",
+        "Isha": "العشاء",
+    },
+    "en": {"Fajr": "Fajr", "Sunrise": "Sunrise", "Dhuhr": "Dhuhr", "Asr": "Asr", "Maghrib": "Maghrib", "Isha": "Isha"},
 }
-prayers_arabic_compact = {
-    'Fajr': 'فجر',
-    'Dhuhr': 'ظهر',
-    'Asr': 'عصر',
-    'Maghrib': 'مغرب',
-    'Isha': 'عشا'
+prayers_compact = {
+    "ar": {"Fajr": "فجر", "Dhuhr": "ظهر", "Asr": "عصر", "Maghrib": "مغرب", "Isha": "عشا"},
+    "en": {"Fajr": "fjr", "Dhuhr": "dhr", "Asr": "asr", "Maghrib": "mgrb", "Isha": "isha"},
 }
+remain = {"ar": "متبقي ", "en": "remains "}
 
 def update():
     try:
@@ -39,6 +40,7 @@ def update():
 
 def main(arguments):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--lang', default='ar', help='Select output language')
     parser.add_argument('--compact', action='store_true', help='Show less text in output')
     parser.add_argument('--next', action='store_true', help='Show time remaining for next salah')
     parser.add_argument('--update', action='store_true', help='Force update of prayers file')
@@ -59,10 +61,10 @@ def main(arguments):
         if not prayers_info:
             return -1
     
-    items = filter(lambda item: item[0] in (prayers_arabic if not args.compact else prayers_arabic_compact), prayers_info['data']['timings'].items())
+    items = filter(lambda item: item[0] in (prayers[args.lang] if not args.compact else prayers_compact[args.lang]), prayers_info['data']['timings'].items())
     items = [(
-        prayers_arabic[item[0]] if not args.compact else prayers_arabic_compact[item[0]], 
-        datetime.combine(prayers_date, datetime.strptime(item[1], '%H:%M').time()) + timedelta(hours=time_offset)
+        prayers[args.lang][item[0]] if not args.compact else prayers_compact[args.lang][item[0]], 
+        datetime.combine(prayers_date, datetime.strptime(item[1], '%H:%M').time()) + timedelta(hours=time_offset),
         ) for item in items]
     items.append((items[0][0], items[0][1] + timedelta(days=1))) # add next day fajr
 
@@ -72,7 +74,7 @@ def main(arguments):
         if next_prayers: 
             next_prayer = min(next_prayers, key=lambda item: abs(item[1] - now))
             time_remaining = next_prayer[1] - now
-            print(next_prayer[0], next_prayer[1].strftime('%-I:%M%P' if not args.compact else '%-I:%M'), '(' + ('متبقي ' if not args.compact else '')  + ':'.join(str(time_remaining).split(':')[:2]) + ')')
+            print(next_prayer[0], next_prayer[1].strftime('%-I:%M%P' if not args.compact else '%-I:%M'), '(' + (remain[args.lang] if not args.compact else '')  + ':'.join(str(time_remaining).split(':')[:2]) + ')')
     else:
         for idx in range(len(items) - 1):
             print(items[idx][0], items[idx][1].strftime('%-I:%M%P' if not args.compact else '%-I:%M'))
