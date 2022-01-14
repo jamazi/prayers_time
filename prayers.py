@@ -10,7 +10,7 @@ import json
 city = "NewYork"
 country = "US"
 time_offset = 0
-prayers_url = "http://api.aladhan.com/v1/timingsByCity?method=2&city={}&country={}".format(city, country)
+prayers_url = "https://api.aladhan.com/v1/timingsByCity?method=2&city={}&country={}".format(city, country)
 prayers_file = os.path.join(os.path.expanduser(os.environ.get("XDG_CACHE_HOME", "~/.cache")), "prayers")
 prayers = {
     "ar": {
