@@ -45,6 +45,7 @@ def main(arguments):
     parser.add_argument("--lang", default="ar", help="Select output language")
     parser.add_argument("--compact", action="store_true", help="Show less text in output")
     parser.add_argument("--next", action="store_true", help="Show time remaining for next salah")
+    parser.add_argument("--date", action="store_true", help="Show hijri date")
     parser.add_argument("--update", action="store_true", help="Force update of prayers file")
     args = parser.parse_args(arguments)
 
@@ -56,6 +57,11 @@ def main(arguments):
 
     if not prayers_info:
         return -1
+
+    if args.date:
+        hijri_date = prayers_info["data"]["date"]["hijri"]
+        print(f"{int(hijri_date['day'])} من {hijri_date['month']['ar']} {hijri_date['year']}")
+        return 0
 
     prayers_date = datetime.fromtimestamp(int(prayers_info["data"]["date"]["timestamp"])).date()
     if prayers_date < datetime.today().date():
